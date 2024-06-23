@@ -553,8 +553,14 @@ rocr::sql_escape() {
 }
 
 rocr::sql_escape_multiline() {
-  rocr::function_assert_one_argument $#
-  sed -e "s/'/''/g" -e "s/^/        || '/" -e "s/\$/' || CHR(10)/" <<< "$1"
+  rocr::function_assert_at_least_n_arguments 2 $#
+  local -r indent_spaces_count="$1"
+  shift
+  rocr::test_natural_number "${indent_spaces_count}" \
+    || rocr::error_exit "Indent spaces count is not a natural number: ${indent_spaces_count}"
+  local -r indent_spaces="$(printf "%${indent_spaces_count}s")"
+  printf "''\n"
+  sed -e "s/'/''/g" -e "s/^/${indent_spaces}|| '/" -e "s/\$/' || CHR(10)/" <<< "$1"
 }
 
 rocr::sql_escaped_or_clause() {
